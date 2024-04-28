@@ -10,7 +10,7 @@ const spDefense = document.getElementById("sp-defense")
 const hp = document.getElementById("hp")
 const weight = document.getElementById("weight")
 const height = document.getElementById("height")
-let div
+
 
 let capitalize = string => string.charAt(0).toUpperCase() + string.slice(1)
 
@@ -26,10 +26,15 @@ async function showPokemon(pokemon){
 
   for(let index = 0; index < 20; index++){
     let pokemonInfo = await (await fetch(pokemon.results[index].url)).json()
-    console.log(pokemon.results[index].url)
 
     let pokemonName = capitalize(pokemonInfo.name)
-    let pokemonID = pokemonInfo.id
+    let pokemonID = pokemonInfo.id.toString()
+    let pokemonIDmoreInfo = pokemonInfo.id.toString()
+    if (pokemonIDmoreInfo.length === 1) {
+      pokemonIDmoreInfo = "00" + pokemonID;
+    } else if (pokemonID.length === 2) {
+      pokemonIDmoreInfo = "0" + pokemonID;
+    }
     let pokemonImage = pokemonInfo.sprites.front_default
     let pokemonAttack = pokemonInfo.stats[1].base_stat
     let pokemonSpAttack = pokemonInfo.stats[3].base_stat
@@ -39,8 +44,12 @@ async function showPokemon(pokemon){
     let pokemonWeight = pokemonInfo.weight
     let pokemonHeight = pokemonInfo.height
 
-    //TODO: let pokemonTypes = pokemonInfo.types
+    let pokemonTypes = pokemonInfo.types.map((type) => `<p class="${type.type.name} tipo">${type.type.name}</p>`)
+    pokemonTypes = pokemonTypes.join('')
+    console.log(pokemonTypes)
 
+
+    let div
     div = document.createElement("div")
     div.classList.add("pokemon-card")
 
@@ -67,15 +76,12 @@ async function showPokemon(pokemon){
         <div class="pokemon-info">
             <h2 class="pokemon-name">${pokemonName}</h2>
             <div class="pokemon-types">
-                <ul id="pokemon-types-list">
-
-                </ul>
+              ${pokemonTypes}
             </div>
             <p class="pokemon-id">#${pokemonID}</p>
         </div>`
     pokemonContainer.append(div)
   }
-    // console.log(`index = ${index}`)
 }
 
 getPokemon()
@@ -83,7 +89,6 @@ getPokemon()
 const next = document.getElementById("next")
 next.addEventListener("click", function (){ 
     offset += 20
-    console.log(offset)
     url = `https://pokeapi.co/api/v2/pokemon?limit=100000&offset=${offset}`
     getPokemon()
     pokemonContainer.innerHTML = ``
